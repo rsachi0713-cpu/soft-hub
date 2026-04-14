@@ -1,0 +1,31 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root, .dark {
+    --background: #0B1121; /* deep navy canvas */
+    --surface: #151C2C; /* elevated dark card */
+    --panel: #1C2438; /* tightly nested card */
+    --text-primary: #ffffff; /* pure white text */
+    --text-secondary: #8b9cb6; /* slate grayish blue */
+  }
+
+  body {
+    @apply bg-background text-[var(--text-primary)] antialiased;
+  }
+}
+
+@layer utilities {
+  .btn-glow {
+    @apply bg-[#00ff88] text-gray-900 shadow-[0_0_15px_rgba(0,255,136,0.5)] hover:shadow-[0_0_25px_rgba(0,255,136,0.8)] transition-all duration-300;
+  }
+  .blue-glow {
+    @apply bg-primary-500 text-white shadow-[0_0_10px_rgba(0,170,255,0.4)] hover:shadow-[0_0_20px_rgba(0,170,255,0.7)] transition-all duration-300;
+  }
+  .nav-pill {
+    @apply px-4 py-2 rounded-full text-xs font-semibold uppercase tracking-wider text-[#8b9cb6] hover:text-white hover:bg-white/10 transition-colors;
+  }
+}
