@@ -24,7 +24,7 @@ function App() {
   }, [darkMode]);
 
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <div className="flex flex-col min-h-screen">
         <Navbar darkMode={darkMode} setDarkMode={setDarkMode} />
         

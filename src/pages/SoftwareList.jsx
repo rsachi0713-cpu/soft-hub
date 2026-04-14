@@ -1,31 +1,39 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import SoftwareCard from '../components/SoftwareCard';
-import { Filter, ChevronDown } from 'lucide-react';
+import { Filter, ChevronDown, Loader2 } from 'lucide-react';
+import { getSoftware } from '../services/softwareService';
 
-const mockData = [
-  { id: '1', name: 'CodeAssist Pro', description: 'Advanced IDE with AI completions based on machine learning models.', rating: 4.9, category: 'Developer Tools' },
-  { id: '2', name: 'DesignFlow', description: 'Next-gen vector graphics editor for UI/UX designers.', rating: 4.8, category: 'Design' },
-  { id: '3', name: 'DataSync', description: 'Cloud backup tool with end-to-end encryption.', rating: 4.6, category: 'Utilities' },
-  { id: '4', name: 'VideoForge', description: 'Professional video editing suite with hardware acceleration.', rating: 4.7, category: 'Media' },
-  { id: '5', name: 'GameBooster', description: 'Optimize your system for maximum frame rates.', rating: 4.5, category: 'Gaming' },
-  { id: '6', name: 'SecurePass', description: 'Military-grade password manager.', rating: 4.9, category: 'Security' },
-];
-
-const categories = ['All', 'Developer Tools', 'Design', 'Utilities', 'Media', 'Gaming', 'Security'];
+const categories = ['All', 'Mobile', 'Games', 'PC', 'Developer Tools', 'Design', 'Utilities', 'Security'];
 
 const SoftwareList = () => {
   const [activeCategory, setActiveCategory] = useState('All');
+  const [software, setSoftware] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await getSoftware();
+        setSoftware(data);
+      } catch (error) {
+        console.error("Error fetching software list:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   const filteredData = activeCategory === 'All' 
-    ? mockData 
-    : mockData.filter(app => app.category === activeCategory);
+    ? software 
+    : software.filter(app => app.category === activeCategory);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
         <div>
           <h1 className="text-3xl font-bold mb-2">Browse Software</h1>
-          <p className="text-text-secondary">Explore thousands of highly-rated applications</p>
+          <p className="text-text-secondary">Explore modded applications and games</p>
         </div>
         
         <div className="flex items-center space-x-4">
@@ -33,9 +41,9 @@ const SoftwareList = () => {
             <Filter className="w-4 h-4" />
             <span>Sort by:</span>
             <select className="bg-transparent font-medium text-text-primary focus:outline-none">
+              <option>Newest</option>
               <option>Popularity</option>
               <option>Highest Rated</option>
-              <option>Newest</option>
             </select>
           </div>
         </div>
@@ -67,16 +75,24 @@ const SoftwareList = () => {
 
         {/* Main Content */}
         <main className="flex-1">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredData.map(app => (
-              <SoftwareCard key={app.id} software={app} />
-            ))}
-          </div>
-          
-          {filteredData.length === 0 && (
-            <div className="text-center py-20 text-text-secondary">
-              No software found in this category.
+          {loading ? (
+            <div className="flex justify-center py-20">
+              <Loader2 className="w-10 h-10 animate-spin text-primary-500" />
             </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredData.map(app => (
+                  <SoftwareCard key={app.id} software={app} />
+                ))}
+              </div>
+              
+              {filteredData.length === 0 && (
+                <div className="text-center py-20 text-text-secondary">
+                  No software found in this category.
+                </div>
+              )}
+            </>
           )}
         </main>
       </div>
@@ -85,3 +101,4 @@ const SoftwareList = () => {
 };
 
 export default SoftwareList;
+

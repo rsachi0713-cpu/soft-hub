@@ -13,14 +13,18 @@ const SoftwareCard = ({ software }) => {
     >
       <div className="flex items-center gap-4 mb-4">
         {/* App Icon Square */}
-        <div className={`w-16 h-16 rounded-2xl shadow-inner flex items-center justify-center flex-shrink-0 ${
+        <div className={`w-16 h-16 rounded-2xl shadow-inner flex items-center justify-center flex-shrink-0 relative overflow-hidden ${
           software.category === 'Games' ? 'bg-gradient-to-br from-purple-500 to-primary-600' :
           software.category === 'Mobile' ? 'bg-gradient-to-br from-green-400 to-green-600' :
           'bg-gradient-to-br from-primary-400 to-primary-700'
         }`}>
-          <span className="text-2xl font-bold text-white shadow-sm">
-            {software.name.charAt(0)}
-          </span>
+          {software.icon ? (
+            <img src={software.icon} alt={software.name} className="absolute inset-0 w-full h-full object-cover" />
+          ) : (
+            <span className="text-2xl font-bold text-white shadow-sm">
+              {software.name.charAt(0)}
+            </span>
+          )}
         </div>
         
         <div className="flex-1">

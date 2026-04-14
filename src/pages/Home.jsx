@@ -1,28 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Gamepad2, Monitor, Code2 } from 'lucide-react';
+import { Gamepad2, Monitor, Code2, Loader2 } from 'lucide-react';
 import SoftwareCard from '../components/SoftwareCard';
-
-const mockMobileMod = [
-  { id: '1', name: 'Spotify Premium Mod', descLine1: 'No Ads, Unlocked', descLine2: 'Free Download', rating: '4.5', category: 'Mobile' },
-  { id: '2', name: 'Netflix Premium', descLine1: 'No Ads, Unlocked', descLine2: 'Free Download', rating: '4.3', category: 'Mobile' },
-  { id: '3', name: 'WhatsApp Premium', descLine1: 'No Ads, Unlocked', descLine2: 'Free Download', rating: '4.5', category: 'Mobile' },
-  { id: '4', name: 'Travel Team Mod', descLine1: 'No Ads, Unlocked', descLine2: 'Free Download', rating: '4.5', category: 'Mobile' },
-];
-
-const mockGames = [
-  { id: '5', name: 'PUBG Mobile Mod', descLine1: 'Aimbot, All Skins', descLine2: 'Unlimited Money', rating: '4.9', category: 'Games' },
-  { id: '6', name: 'Among Us Mod', descLine1: 'All Skins', descLine2: 'Unlimited Money', rating: '4.3', category: 'Games' },
-  { id: '7', name: 'Valorant Mobile', descLine1: 'Aimbot, Maps', descLine2: 'Free Characters', rating: '4.7', category: 'Games' },
-  { id: '8', name: 'Standoff 2 Mod', descLine1: 'Aimbot, All Skins', descLine2: 'Unlimited Money', rating: '4.8', category: 'Games' },
-];
-
-const mockPcApps = [
-  { id: '9', name: 'Photoshop Mod', descLine1: 'No Ads, Unlocked', descLine2: 'Free Download', rating: '4.5', category: 'PC' },
-  { id: '10', name: 'Game Trainers', descLine1: 'Mods, Extras', descLine2: 'Free Download', rating: '4.5', category: 'PC' },
-  { id: '11', name: 'VideoForge Pro', descLine1: 'Premium Unlocked', descLine2: 'Free Download', rating: '4.6', category: 'PC' },
-];
+import { getSoftware } from '../services/softwareService';
 
 // Helper to render sections
 const Section = ({ icon: Icon, title, data, catLink }) => (
@@ -45,10 +26,34 @@ const Section = ({ icon: Icon, title, data, catLink }) => (
         <SoftwareCard key={app.id} software={app} />
       ))}
     </div>
+    {data.length === 0 && (
+      <p className="px-4 text-text-secondary italic text-sm">No items added to this category yet.</p>
+    )}
   </section>
 );
 
 const Home = () => {
+  const [software, setSoftware] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await getSoftware();
+        setSoftware(data);
+      } catch (error) {
+        console.error("Error fetching software:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const mobileMods = software.filter(app => app.category === 'Mobile').slice(0, 4);
+  const games = software.filter(app => app.category === 'Games').slice(0, 4);
+  const pcApps = software.filter(app => app.category === 'PC').slice(0, 4);
+
   return (
     <div className="max-w-7xl mx-auto py-8">
       
@@ -89,16 +94,23 @@ const Home = () => {
       </motion.div>
 
       {/* Structured Layout corresponding to the image logic */}
-      <div className="flex flex-col gap-8">
-        <Section icon={Code2} title="MOBILE MOD APK" data={mockMobileMod} catLink="mobile" />
-        <Section icon={Gamepad2} title="GAMES" data={mockGames} catLink="games" />
-        
-        {/* PC Section mapped below or aside - responsive layout wraps perfectly */}
-        <Section icon={Monitor} title="PC MOD APPS" data={mockPcApps} catLink="pc" />
-      </div>
+      {loading ? (
+        <div className="flex justify-center py-20">
+          <Loader2 className="w-10 h-10 animate-spin text-primary-500" />
+        </div>
+      ) : (
+        <div className="flex flex-col gap-8">
+          <Section icon={Code2} title="MOBILE MOD APK" data={mobileMods} catLink="mobile" />
+          <Section icon={Gamepad2} title="GAMES" data={games} catLink="games" />
+          
+          {/* PC Section mapped below or aside - responsive layout wraps perfectly */}
+          <Section icon={Monitor} title="PC MOD APPS" data={pcApps} catLink="pc" />
+        </div>
+      )}
 
     </div>
   );
 };
 
 export default Home;
+
